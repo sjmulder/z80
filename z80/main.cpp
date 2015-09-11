@@ -95,7 +95,15 @@ enum Op : uint8_t {
 	LD_ind_HL_F,
 	LD_ind_HL_L = 0x75,
 	LD_ind_HL_A = 0x77,
-	ADD_A_B = 0x80,
+	LD_A_B,
+	LD_A_C,
+	LD_A_D,
+	LD_A_E,
+	LD_A_F,
+	LD_A_L,
+	LD_A_ind_HL,
+	LD_A_A,
+	ADD_A_B,
 	ADD_A_C,
 	ADD_A_D,
 	ADD_A_E,
@@ -371,6 +379,13 @@ string Z80::pc_str()
 	
 	switch (code = next()) {
 		case NOOP: str << "noop"; break;
+		case LD_A_A: str << "ld a, a"; break;
+		case LD_A_B: str << "ld a, b"; break;
+		case LD_A_C: str << "ld a, c"; break;
+		case LD_A_D: str << "ld a, d"; break;
+		case LD_A_E: str << "ld a, e"; break;
+		case LD_A_F: str << "ld a, f"; break;
+		case LD_A_L: str << "ld a, l"; break;
 		case LD_B_A: str << "ld b, a"; break;
 		case LD_B_B: str << "ld b, b"; break;
 		case LD_B_C: str << "ld b, c"; break;
@@ -413,6 +428,7 @@ string Z80::pc_str()
 		case LD_L_E: str << "ld l, e"; break;
 		case LD_L_F: str << "ld l, f"; break;
 		case LD_L_L: str << "ld l, l"; break;
+		case LD_A_ind_HL: str << "ld a, (hl)"; break;
 		case LD_A_ind_BC: str << "ld a, (bc)"; break;
 		case LD_A_ind_DE: str << "ld a, (de)"; break;
 		case LD_B_ind_HL: str << "ld b, (hl)"; break;
@@ -630,6 +646,13 @@ void Z80::step()
 
 	uint8_t code;
 	switch (code = next()) {
+		case LD_A_A: break;
+		case LD_A_B: ra_ = rb_; break;;
+		case LD_A_C: ra_ = rc_; break;
+		case LD_A_D: ra_ = rd_; break;
+		case LD_A_E: ra_ = re_; break;
+		case LD_A_F: ra_ = rf_; break;
+		case LD_A_L: ra_ = rl_; break;
 		case LD_B_A: rb_ = ra_; break;
 		case LD_B_B: break;
 		case LD_B_C: rb_ = rc_; break;
@@ -672,6 +695,7 @@ void Z80::step()
 		case LD_L_E: rl_ = re_; break;
 		case LD_L_F: rl_ = rf_; break;
 		case LD_L_L: break;
+		case LD_A_ind_HL: ra_ = read(rhl()); break;
 		case LD_A_ind_BC: ra_ = read(rbc()); break;
 		case LD_A_ind_DE: ra_ = read(rde()); break;
 		case LD_B_ind_HL: rb_ = read(rhl()); break;
