@@ -20,10 +20,26 @@ const int MEM_SIZE = 32 * 1024;
 enum Op : uint8_t {
 	NOOP = 0x00,
 	LD_ind_BC_A = 0x02,
+	INC_B = 0x04,
+	DEC_B = 0x05,
 	LD_A_ind_BC = 0x0A,
+	INC_C = 0x0C,
+	DEC_C = 0x0D,
 	LD_ind_DE_A = 0x12,
+	INC_D = 0x14,
+	DEC_D = 0x15,
 	LD_A_ind_DE = 0x1A,
+	INC_E = 0x1C,
+	DEC_E = 0x1D,
+	INC_F = 0x24,
+	DEC_F = 0x25,
+	INC_L = 0x2C,
+	DEC_L = 0x2D,
 	LD_ext_A = 0x32,
+	INC_ind_HL = 0x34,
+	DEC_ind_HL = 0x35,
+	INC_A = 0x3C,
+	DEC_A = 0x3D,
 	LD_B_B = 0x40,
 	LD_B_C,
 	LD_B_D,
@@ -79,15 +95,89 @@ enum Op : uint8_t {
 	LD_ind_HL_F,
 	LD_ind_HL_L = 0x75,
 	LD_ind_HL_A = 0x77,
+	ADD_A_B = 0x80,
+	ADD_A_C,
+	ADD_A_D,
+	ADD_A_E,
+	ADD_A_F,
+	ADD_A_L,
+	ADD_A_ind_HL,
+	ADD_A_A,
+	ADC_A_B,
+	ADC_A_C,
+	ADC_A_D,
+	ADC_A_E,
+	ADC_A_F,
+	ADC_A_L,
+	ADC_A_ind_HL,
+	ADC_A_A,
+	SUB_A_B,
+	SUB_A_C,
+	SUB_A_D,
+	SUB_A_E,
+	SUB_A_F,
+	SUB_A_L,
+	SUB_A_ind_HL,
+	SUB_A_A,
+	SBC_A_B,
+	SBC_A_C,
+	SBC_A_D,
+	SBC_A_E,
+	SBC_A_F,
+	SBC_A_L,
+	SBC_A_ind_HL,
+	SBC_A_A,
+	AND_A_B,
+	AND_A_C,
+	AND_A_D,
+	AND_A_E,
+	AND_A_F,
+	AND_A_L,
+	AND_A_ind_HL,
+	AND_A_A,
+	XOR_A_B,
+	XOR_A_C,
+	XOR_A_D,
+	XOR_A_E,
+	XOR_A_F,
+	XOR_A_L,
+	XOR_A_ind_HL,
+	XOR_A_A,
+	OR_A_B,
+	OR_A_C,
+	OR_A_D,
+	OR_A_E,
+	OR_A_F,
+	OR_A_L,
+	OR_A_ind_HL,
+	OR_A_A,
+	CP_B,
+	CP_C,
+	CP_D,
+	CP_E,
+	CP_F,
+	CP_L,
+	CP_ind_HL,
+	CP_A = 0xBF,
+	ADD_A_imm = 0xC6,
+	ADC_A_imm = 0xCE,
+	SUB_A_imm = 0xD6,
 	EXT_DD = 0xDD,
+	SBC_A_imm = 0xDE,
+	AND_A_imm = 0xE6,
 	EXT_ED = 0xED,
-	EXT_FD = 0xFD
+	XOR_A_imm = 0xEE,
+	OR_A_imm = 0xF6,
+	EXT_FD = 0xFD,
+	CP_imm = 0xFE
 };
 
 enum DDOp : uint8_t {
 	DD_LD_D_imm = 0x1B,
 	DD_LD_E_imm = 0x1E,
 	DD_LD_H_imm = 0x2B,
+	DD_INC_idx_IX = 0x34,
+	DD_DEC_idx_IX = 0x35,
 	DD_LD_idx_IX_imm = 0x36,
 	DD_LD_B_idx_IX = 0x46,
 	DD_LD_C_idx_IX = 0x4E,
@@ -104,6 +194,14 @@ enum DDOp : uint8_t {
 	DD_LD_idx_IX_A,
 	DD_LD_ind_HL_imm = 0x78,
 	DD_LD_A_idx_IY = 0x7E,
+	DD_ADD_A_idx_IX = 0x86,
+	DD_ADC_A_idx_IX = 0x8E,
+	DD_SUB_A_idx_IX = 0x96,
+	DD_SBC_A_idx_IX = 0x9E,
+	DD_AND_A_idx_IX = 0xA6,
+	DD_XOR_A_idx_IX = 0xAE,
+	DD_OR_A_idx_IX = 0xB6,
+	DD_CP_idx_IX = 0xBE,
 	DD_LD_B_imm = 0xD5,
 	DD_LD_C_imm = 0xDE
 };
@@ -117,6 +215,8 @@ enum FDOp : uint8_t {
 	FD_LD_A_imm = 0x2E,
 	FD_LD_idx_IY_imm = 0x36,
 	FD_LD_A_ext = 0x3A,
+	FD_INC_idx_IY = 0x34,
+	FD_DEC_idx_IY = 0x35,
 	FD_LD_B_idx_IY = 0x46,
 	FD_LD_C_idx_IY = 0x4E,
 	FD_LD_D_idx_IY = 0x56,
@@ -129,10 +229,25 @@ enum FDOp : uint8_t {
 	FD_LD_idx_IY_F,
 	FD_LD_idx_IY_L,
 	FD_LD_idx_IY_A = 0x77,
-	FD_LD_A_idx_IX = 0x7E
+	FD_LD_A_idx_IX = 0x7E,
+	FD_ADD_A_idx_IY = 0x86,
+	FD_ADC_A_idx_IY = 0x8E,
+	FD_SUB_A_idx_IY = 0x96,
+	FD_SBC_A_idx_IY = 0x9E,
+	FD_AND_A_idx_IY = 0xA6,
+	FD_XOR_A_idx_IY = 0xAE,
+	FD_OR_A_idx_IY = 0xB6,
+	FD_CP_idx_IY = 0xBE
 };
 
 class Z80 {
+	const uint8_t FLAG_C = 0x01;
+	const uint8_t FLAG_N = 0x02;
+	const uint8_t FLAG_PV = 0x04;
+	const uint8_t FLAG_H = 0x08;
+	const uint8_t FLAG_Z = 0x40;
+	const uint8_t FLAG_S = 0x80;
+	
 	array<uint8_t, MEM_SIZE> ram_;
 	
 	uint8_t ra_ = 0;
@@ -161,6 +276,20 @@ class Z80 {
 	uint16_t rhl() const { return (uint16_t)rh_ << 8 & rl_; }
 	uint16_t rbc() const { return (uint16_t)rb_ << 8 & rc_; }
 	uint16_t rde() const { return (uint16_t)rd_ << 8 & re_; }
+	
+	uint8_t w_calc_flags(uint16_t result, bool is_sub);
+	uint8_t w_logic_flags(uint8_t result);
+	
+	uint8_t op_add(uint8_t a, uint8_t b) { return w_calc_flags(a + b, false); }
+	uint8_t op_adc(uint8_t a, uint8_t b) { return w_calc_flags(a + b + (rf_ & 0x01), false); }
+	uint8_t op_sub(uint8_t a, uint8_t b) { return w_calc_flags(a - b, true); }
+	uint8_t op_sbc(uint8_t a, uint8_t b) { return w_calc_flags(a - b - (rf_ & 0x01), true); }
+	uint8_t op_and(uint8_t a, uint8_t b) { return w_logic_flags(a & b); }
+	uint8_t op_xor(uint8_t a, uint8_t b) { return w_logic_flags(a ^ b); }
+	uint8_t op_or(uint8_t a, uint8_t b) { return w_logic_flags(a | b); }
+	void op_cp(uint8_t a) { w_logic_flags(a); }
+	uint8_t op_inc(uint8_t a) { return w_calc_flags(a + 1, false); }
+	uint8_t op_dec(uint8_t a) { return w_calc_flags(a - 1, false); }
 	
 	uint8_t next() { return read(rpc_++); }
 	uint16_t next16() { return ((uint16_t)next() << 8) | next(); }
@@ -200,6 +329,37 @@ public:
 	uint16_t reg_pc() const { return rpc_; }
 };
 
+
+uint8_t Z80::w_calc_flags(uint16_t result, bool is_sub)
+{
+	rf_ = 0;
+	
+	if (result & 0x0100) rf_ |= FLAG_C;
+	if (is_sub) rf_ |= FLAG_N;
+	if (result > 0xFF) rf_ |= FLAG_PV;
+	if (result & 0x08) rf_ |= FLAG_H;
+	if (!result) rf_ |= FLAG_Z;
+	if (result & 0x80) rf_ |= FLAG_S;
+	
+	return (uint8_t)result;
+}
+
+uint8_t Z80::w_logic_flags(uint8_t result)
+{
+	rf_ = 0;
+	
+	uint8_t x = result;
+	x ^= x >> 4;
+	x ^= x >> 2;
+	x ^= x >> 1;
+	bool parity = (~x) & 0x01;
+
+	if (parity) rf_ |= FLAG_PV;
+	if (!result) rf_ |= FLAG_Z;
+	if (result & 0x80) rf_ |= FLAG_S;
+	
+	return result;
+}
 
 string Z80::pc_str()
 {
@@ -271,6 +431,94 @@ string Z80::pc_str()
 		case LD_ind_BC_A: str << "ld (bc), a"; break;
 		case LD_ind_DE_A: str << "ld (de), a"; break;
 		case LD_ext_A: str << "ld (0x" << setw(4) << next16() << "), a"; break;
+		case ADD_A_A: str << "add a, a"; break;
+		case ADD_A_B: str << "add a, b"; break;
+		case ADD_A_C: str << "add a, c"; break;
+		case ADD_A_D: str << "add a, d"; break;
+		case ADD_A_E: str << "add a, e"; break;
+		case ADD_A_F: str << "add a, f"; break;
+		case ADD_A_L: str << "add a, l"; break;
+		case ADD_A_ind_HL: str << "add a, (hl)"; break;
+		case ADD_A_imm: str << "add a, 0x" << setw(2) << next(); break;
+		case ADC_A_A: str << "adc a, a"; break;
+		case ADC_A_B: str << "adc a, b"; break;
+		case ADC_A_C: str << "adc a, c"; break;
+		case ADC_A_D: str << "adc a, d"; break;
+		case ADC_A_E: str << "adc a, e"; break;
+		case ADC_A_F: str << "adc a, f"; break;
+		case ADC_A_L: str << "adc a, l"; break;
+		case ADC_A_ind_HL: str << "adc a, (hl)"; break;
+		case ADC_A_imm: str << "adc a, 0x" << setw(2) << next(); break;
+		case SUB_A_A: str << "sub a, a"; break;
+		case SUB_A_B: str << "sub a, b"; break;
+		case SUB_A_C: str << "sub a, c"; break;
+		case SUB_A_D: str << "sub a, d"; break;
+		case SUB_A_E: str << "sub a, e"; break;
+		case SUB_A_F: str << "sub a, f"; break;
+		case SUB_A_L: str << "sub a, l"; break;
+		case SUB_A_ind_HL: str << "sub a, (hl)"; break;
+		case SUB_A_imm: str << "sub a, 0x" << setw(2) << next(); break;
+		case SBC_A_A: str << "sbc a, a"; break;
+		case SBC_A_B: str << "sbc a, b"; break;
+		case SBC_A_C: str << "sbc a, c"; break;
+		case SBC_A_D: str << "sbc a, d"; break;
+		case SBC_A_E: str << "sbc a, e"; break;
+		case SBC_A_F: str << "sbc a, f"; break;
+		case SBC_A_L: str << "sbc a, l"; break;
+		case SBC_A_ind_HL: str << "sbc a, (hl)"; break;
+		case SBC_A_imm: str << "sbc a, 0x" << setw(2) << next(); break;
+		case AND_A_A: str << "and a, a"; break;
+		case AND_A_B: str << "and a, b"; break;
+		case AND_A_C: str << "and a, c"; break;
+		case AND_A_D: str << "and a, d"; break;
+		case AND_A_E: str << "and a, e"; break;
+		case AND_A_F: str << "and a, f"; break;
+		case AND_A_L: str << "and a, l"; break;
+		case AND_A_ind_HL: str << "and a, (hl)"; break;
+		case AND_A_imm: str << "and a, 0x" << setw(2) << next(); break;
+		case XOR_A_A: str << "xor a, a"; break;
+		case XOR_A_B: str << "xor a, b"; break;
+		case XOR_A_C: str << "xor a, c"; break;
+		case XOR_A_D: str << "xor a, d"; break;
+		case XOR_A_E: str << "xor a, e"; break;
+		case XOR_A_F: str << "xor a, f"; break;
+		case XOR_A_L: str << "xor a, l"; break;
+		case XOR_A_ind_HL: str << "xor a, (hl)"; break;
+		case XOR_A_imm: str << "xor a, 0x" << setw(2) << next(); break;
+		case OR_A_A: str << "or a, a"; break;
+		case OR_A_B: str << "or a, b"; break;
+		case OR_A_C: str << "or a, c"; break;
+		case OR_A_D: str << "or a, d"; break;
+		case OR_A_E: str << "or a, e"; break;
+		case OR_A_F: str << "or a, f"; break;
+		case OR_A_L: str << "or a, l"; break;
+		case OR_A_ind_HL: str << "or a, (hl)"; break;
+		case OR_A_imm: str << "or a, 0x" << setw(2) << next(); break;
+		case CP_A: str << "cp a"; break;
+		case CP_B: str << "cp b"; break;
+		case CP_C: str << "cp c"; break;
+		case CP_D: str << "cp d"; break;
+		case CP_E: str << "cp e"; break;
+		case CP_F: str << "cp f"; break;
+		case CP_L: str << "cp l"; break;
+		case CP_ind_HL: str << "cp (hl)"; break;
+		case CP_imm: str << "cp 0x" << setw(2) << next(); break;
+		case INC_A: str << "inc a"; break;
+		case INC_B: str << "inc b"; break;
+		case INC_C: str << "inc c"; break;
+		case INC_D: str << "inc d"; break;
+		case INC_E: str << "inc e"; break;
+		case INC_F: str << "inc f"; break;
+		case INC_L: str << "inc l"; break;
+		case INC_ind_HL: str << "inc (hl)"; break;
+		case DEC_A: str << "dec a"; break;
+		case DEC_B: str << "dec b"; break;
+		case DEC_C: str << "dec c"; break;
+		case DEC_D: str << "dec d"; break;
+		case DEC_E: str << "dec e"; break;
+		case DEC_F: str << "dec f"; break;
+		case DEC_L: str << "dec l"; break;
+		case DEC_ind_HL: str << "dec (hl)"; break;
 			
 		case EXT_DD:
 			switch (code = next()) {
@@ -295,6 +543,14 @@ string Z80::pc_str()
 				case DD_LD_idx_IX_L: str << "ld (ix + 0x" << setw(2) << (int)next() << "), l"; break;
 				case DD_LD_idx_IX_imm: str << "ld (ix + 0x" << setw(2) << (int)next() << "), 0x" << setw(2) << (int)next(); break;
 				case DD_LD_ind_HL_imm: str << "ld (hl), 0x" << setw(2) << (int)next(); break;
+				case DD_ADD_A_idx_IX: str << "add a, (ix + 0x" << setw(2) << (int)next() << ")"; break;
+				case DD_ADC_A_idx_IX: str << "adc a, (ix + 0x" << setw(2) << (int)next() << ")"; break;
+				case DD_SUB_A_idx_IX: str << "sub a, (ix + 0x" << setw(2) << (int)next() << ")"; break;
+				case DD_SBC_A_idx_IX: str << "sbc a, (ix + 0x" << setw(2) << (int)next() << ")"; break;
+				case DD_AND_A_idx_IX: str << "and a, (ix + 0x" << setw(2) << (int)next() << ")"; break;
+				case DD_XOR_A_idx_IX: str << "xor a, (ix + 0x" << setw(2) << (int)next() << ")"; break;
+				case DD_OR_A_idx_IX: str << "or a, (ix + 0x" << setw(2) << (int)next() << ")"; break;
+				case DD_CP_idx_IX: str << "cp (ix + 0x" << setw(2) << (int)next() << ")"; break;
 				default: str << "0x" << (0xDD00 & code); break;
 			}
 			break;
@@ -325,6 +581,14 @@ string Z80::pc_str()
 				case FD_LD_idx_IY_F: str << "ld (iy + 0x" << setw(2) << (int)next() << "), f"; break;
 				case FD_LD_idx_IY_L: str << "ld (iy + 0x" << setw(2) << (int)next() << "), l"; break;
 				case FD_LD_idx_IY_imm: str << "ld (iy + 0x" << setw(2) << (int)next() << "), 0x" << setw(2) << (int)next(); break;
+				case FD_ADD_A_idx_IY: str << "add a, (iy + 0x" << setw(2) << (int)next() << ")"; break;
+				case FD_ADC_A_idx_IY: str << "adc a, (iy + 0x" << setw(2) << (int)next() << ")"; break;
+				case FD_SUB_A_idx_IY: str << "sub a, (iy + 0x" << setw(2) << (int)next() << ")"; break;
+				case FD_SBC_A_idx_IY: str << "sbc a, (iy + 0x" << setw(2) << (int)next() << ")"; break;
+				case FD_AND_A_idx_IY: str << "and a, (iy + 0x" << setw(2) << (int)next() << ")"; break;
+				case FD_XOR_A_idx_IY: str << "xor a, (iy + 0x" << setw(2) << (int)next() << ")"; break;
+				case FD_OR_A_idx_IY: str << "or a, (iy + 0x" << setw(2) << (int)next() << ")"; break;
+				case FD_CP_idx_IY: str << "cp (iy + 0x" << setw(2) << (int)next() << ")"; break;
 				default: str << "0x" << (0xFD00 & code); break;
 			}
 			break;
@@ -362,6 +626,8 @@ void Z80::dump_regs()
 
 void Z80::step()
 {
+	uint8_t tmp;
+
 	uint8_t code;
 	switch (code = next()) {
 		case LD_B_A: rb_ = ra_; break;
@@ -424,6 +690,94 @@ void Z80::step()
 		case LD_ind_BC_A: write(rbc(), ra_); break;
 		case LD_ind_DE_A: write(rde(), ra_); break;
 		case LD_ext_A: write(next16(), ra_); break;
+		case ADD_A_A: ra_ = op_add(ra_, ra_); break;
+		case ADD_A_B: ra_ = op_add(ra_, rb_); break;
+		case ADD_A_C: ra_ = op_add(ra_, rc_); break;
+		case ADD_A_D: ra_ = op_add(ra_, rd_); break;
+		case ADD_A_E: ra_ = op_add(ra_, re_); break;
+		case ADD_A_F: ra_ = op_add(ra_, rf_); break;
+		case ADD_A_L: ra_ = op_add(ra_, rl_); break;
+		case ADD_A_ind_HL: ra_ = op_add(ra_, read(rhl())); break;
+		case ADD_A_imm: ra_ = op_add(ra_, next()); break;
+		case ADC_A_A: ra_ = op_adc(ra_, ra_); break;
+		case ADC_A_B: ra_ = op_adc(ra_, rb_); break;
+		case ADC_A_C: ra_ = op_adc(ra_, rc_); break;
+		case ADC_A_D: ra_ = op_adc(ra_, rd_); break;
+		case ADC_A_E: ra_ = op_adc(ra_, re_); break;
+		case ADC_A_F: ra_ = op_adc(ra_, rf_); break;
+		case ADC_A_L: ra_ = op_adc(ra_, rl_); break;
+		case ADC_A_ind_HL: ra_ = op_adc(ra_, read(rhl())); break;
+		case ADC_A_imm: ra_ = op_adc(ra_, next()); break;
+		case SUB_A_A: ra_ = op_sub(ra_, ra_); break;
+		case SUB_A_B: ra_ = op_sub(ra_, rb_); break;
+		case SUB_A_C: ra_ = op_sub(ra_, rc_); break;
+		case SUB_A_D: ra_ = op_sub(ra_, rd_); break;
+		case SUB_A_E: ra_ = op_sub(ra_, re_); break;
+		case SUB_A_F: ra_ = op_sub(ra_, rf_); break;
+		case SUB_A_L: ra_ = op_sub(ra_, rl_); break;
+		case SUB_A_ind_HL: ra_ = op_sub(ra_, read(rhl())); break;
+		case SUB_A_imm: ra_ = op_sub(ra_, next()); break;
+		case SBC_A_A: ra_ = op_sbc(ra_, ra_); break;
+		case SBC_A_B: ra_ = op_sbc(ra_, rb_); break;
+		case SBC_A_C: ra_ = op_sbc(ra_, rc_); break;
+		case SBC_A_D: ra_ = op_sbc(ra_, rd_); break;
+		case SBC_A_E: ra_ = op_sbc(ra_, re_); break;
+		case SBC_A_F: ra_ = op_sbc(ra_, rf_); break;
+		case SBC_A_L: ra_ = op_sbc(ra_, rl_); break;
+		case SBC_A_ind_HL: ra_ = op_sbc(ra_, read(rhl())); break;
+		case SBC_A_imm: ra_ = op_sbc(ra_, next()); break;
+		case AND_A_A: ra_ = op_and(ra_, ra_); break;
+		case AND_A_B: ra_ = op_and(ra_, rb_); break;
+		case AND_A_C: ra_ = op_and(ra_, rc_); break;
+		case AND_A_D: ra_ = op_and(ra_, rd_); break;
+		case AND_A_E: ra_ = op_and(ra_, re_); break;
+		case AND_A_F: ra_ = op_and(ra_, rf_); break;
+		case AND_A_L: ra_ = op_and(ra_, rl_); break;
+		case AND_A_ind_HL: ra_ = op_and(ra_, read(rhl())); break;
+		case AND_A_imm: ra_ = op_and(ra_, next()); break;
+		case XOR_A_A: ra_ = op_xor(ra_, ra_); break;
+		case XOR_A_B: ra_ = op_xor(ra_, rb_); break;
+		case XOR_A_C: ra_ = op_xor(ra_, rc_); break;
+		case XOR_A_D: ra_ = op_xor(ra_, rd_); break;
+		case XOR_A_E: ra_ = op_xor(ra_, re_); break;
+		case XOR_A_F: ra_ = op_xor(ra_, rf_); break;
+		case XOR_A_L: ra_ = op_xor(ra_, rl_); break;
+		case XOR_A_ind_HL: ra_ = op_xor(ra_, read(rhl())); break;
+		case XOR_A_imm: ra_ = op_xor(ra_, next()); break;
+		case OR_A_A: ra_ = op_or(ra_, ra_); break;
+		case OR_A_B: ra_ = op_or(ra_, rb_); break;
+		case OR_A_C: ra_ = op_or(ra_, rc_); break;
+		case OR_A_D: ra_ = op_or(ra_, rd_); break;
+		case OR_A_E: ra_ = op_or(ra_, re_); break;
+		case OR_A_F: ra_ = op_or(ra_, rf_); break;
+		case OR_A_L: ra_ = op_or(ra_, rl_); break;
+		case OR_A_ind_HL: ra_ = op_or(ra_, read(rhl())); break;
+		case OR_A_imm: ra_ = op_or(ra_, next()); break;
+		case CP_A: op_cp(ra_); break;
+		case CP_B: op_cp(rb_); break;
+		case CP_C: op_cp(rc_); break;
+		case CP_D: op_cp(rd_); break;
+		case CP_E: op_cp(re_); break;
+		case CP_F: op_cp(rf_); break;
+		case CP_L: op_cp(rl_); break;
+		case CP_ind_HL: op_cp(read(rhl())); break;
+		case CP_imm: op_cp(next()); break;
+		case INC_A: ra_ = op_inc(ra_); break;
+		case INC_B: rb_ = op_inc(rb_); break;
+		case INC_C: rc_ = op_inc(rc_); break;
+		case INC_D: rd_ = op_inc(rd_); break;
+		case INC_E: re_ = op_inc(re_); break;
+		case INC_F: rf_ = op_inc(rf_); break;
+		case INC_L: rl_ = op_inc(rl_); break;
+		case INC_ind_HL: tmp = read(rhl()) + next(); write(tmp, op_inc(read(tmp))); break;
+		case DEC_A: ra_ = op_dec(ra_); break;
+		case DEC_B: rb_ = op_dec(rb_); break;
+		case DEC_C: rc_ = op_dec(rc_); break;
+		case DEC_D: rd_ = op_dec(rd_); break;
+		case DEC_E: re_ = op_dec(re_); break;
+		case DEC_F: rf_ = op_dec(rf_); break;
+		case DEC_L: rl_ = op_dec(rl_); break;
+		case DEC_ind_HL: tmp = read(rhl()) + next(); write(tmp, op_dec(read(tmp))); break;
 		
 		case EXT_DD:
 			switch (code = next()) {
@@ -448,7 +802,15 @@ void Z80::step()
 				case DD_LD_idx_IX_L: write(rix_ + next(), rl_); break;
 				case DD_LD_idx_IX_imm: write(rix_ + next(), next()); break;
 				case DD_LD_ind_HL_imm: write(rhl(), next()); break;
-					
+				case DD_ADD_A_idx_IX: ra_ = op_add(ra_, read(rix_ + next())); break;
+				case DD_ADC_A_idx_IX: ra_ = op_adc(ra_, read(rix_ + next())); break;
+				case DD_SUB_A_idx_IX: ra_ = op_sub(ra_, read(rix_ + next())); break;
+				case DD_SBC_A_idx_IX: ra_ = op_sbc(ra_, read(rix_ + next())); break;
+				case DD_AND_A_idx_IX: ra_ = op_and(ra_, read(rix_ + next())); break;
+				case DD_XOR_A_idx_IX: ra_ = op_xor(ra_, read(rix_ + next())); break;
+				case DD_OR_A_idx_IX: ra_ = op_or(ra_, read(rix_ + next())); break;
+				case DD_CP_idx_IX: op_cp(read(rix_ + next())); break;
+
 				default:
 					cerr << "unknown 0xDD opcode: 0x" << code << endl;
 					break;
@@ -484,6 +846,14 @@ void Z80::step()
 				case FD_LD_idx_IY_F: write(riy_ + next(), rf_); break;
 				case FD_LD_idx_IY_L: write(riy_ + next(), rl_); break;
 				case FD_LD_idx_IY_imm: write(riy_ + next(), next()); break;
+				case FD_ADD_A_idx_IY: ra_ = op_add(ra_, read(riy_ + next())); break;
+				case FD_ADC_A_idx_IY: ra_ = op_adc(ra_, read(riy_ + next())); break;
+				case FD_SUB_A_idx_IY: ra_ = op_sub(ra_, read(riy_ + next())); break;
+				case FD_SBC_A_idx_IY: ra_ = op_sbc(ra_, read(riy_ + next())); break;
+				case FD_AND_A_idx_IY: ra_ = op_and(ra_, read(riy_ + next())); break;
+				case FD_XOR_A_idx_IY: ra_ = op_xor(ra_, read(riy_ + next())); break;
+				case FD_OR_A_idx_IY: ra_ = op_or(ra_, read(riy_ + next())); break;
+				case FD_CP_idx_IY: op_cp(read(riy_ + next())); break;
 					
 				default:
 					cerr << "unknown 0xFD opcode: 0x" << code << endl;
@@ -526,11 +896,13 @@ int main()
 {
 	Z80 cpu;
 	cpu.ram() = {
-		EXT_FD, FD_LD_A_imm, 0x01,
-		EXT_DD, DD_LD_B_imm, 0x0A,
-		LD_C_A,
-		LD_D_B,
 		EXT_FD, FD_LD_A_ext, 0x00, 0x03,
+		LD_B_A,
+		ADD_A_B,
+		SUB_A_B,
+		SUB_A_B,
+		OR_A_imm, 0xF0,
+		XOR_A_imm, 0xFF,
 		NOOP
 	};
 
