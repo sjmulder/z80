@@ -688,6 +688,7 @@ void Z80::dump_regs()
 void Z80::step()
 {
 	uint8_t tmp;
+	uint16_t tmp16;
 
 	uint8_t code;
 	switch (code = next()) {
@@ -848,14 +849,14 @@ void Z80::step()
 		case DEC_L: rl_ = op_dec(rl_); break;
 		case DEC_ind_HL: tmp = read(rhl()) + next(); write(tmp, op_dec(read(tmp))); break;
 		case JP: rpc_ = next16(); break;
-		case JP_C: tmp = next16(); if (fc()) rpc_ = tmp; break;
-		case JP_NC: tmp = next16(); if (!fc()) rpc_ = tmp; break;
-		case JP_Z: tmp = next16(); if (fz()) rpc_ = tmp; break;
-		case JP_NZ: tmp = next16(); if (!fz()) rpc_ = tmp; break;
-		case JP_PO: tmp = next16(); if (!fpv()) rpc_ = tmp; break;
-		case JP_PE: tmp = next16(); if (fpv()) rpc_ = tmp; break;
-		case JP_M: tmp = next16(); if (fs()) rpc_ = tmp; break;
-		case JP_P: tmp = next16(); if (!fs()) rpc_ = tmp; break;
+		case JP_C: tmp16 = next16(); if (fc()) rpc_ = tmp16; break;
+		case JP_NC: tmp16 = next16(); if (!fc()) rpc_ = tmp16; break;
+		case JP_Z: tmp16 = next16(); if (fz()) rpc_ = tmp16; break;
+		case JP_NZ: tmp16 = next16(); if (!fz()) rpc_ = tmp16; break;
+		case JP_PO: tmp16 = next16(); if (!fpv()) rpc_ = tmp16; break;
+		case JP_PE: tmp16 = next16(); if (fpv()) rpc_ = tmp16; break;
+		case JP_M: tmp16 = next16(); if (fs()) rpc_ = tmp16; break;
+		case JP_P: tmp16 = next16(); if (!fs()) rpc_ = tmp16; break;
 		case JP_ind_HL: rpc_ = read(rhl()); break;
 		case JR: tmp = next(); rpc_ += *((int8_t*)&tmp); break;
 		case JR_C: tmp = next(); if (fc()) rpc_ += *((int8_t*)&tmp); break;
