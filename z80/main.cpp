@@ -285,6 +285,13 @@ class Z80 {
 	uint16_t rbc() const { return (uint16_t)rb_ << 8 & rc_; }
 	uint16_t rde() const { return (uint16_t)rd_ << 8 & re_; }
 	
+	bool fc() const { return (rf_ & FLAG_C) > 0; }
+	bool fn() const { return (rf_ & FLAG_N) > 0; }
+	bool fpv() const { return (rf_ & FLAG_PV) > 0; }
+	bool fh() const { return (rf_ & FLAG_H) > 0; }
+	bool fz() const { return (rf_ & FLAG_Z) > 0; }
+	bool fs() const { return (rf_ & FLAG_S) > 0; }
+
 	uint8_t w_calc_flags(uint16_t result, bool is_sub);
 	uint8_t w_logic_flags(uint8_t result);
 	
@@ -621,7 +628,7 @@ string Z80::pc_str()
 void Z80::dump_regs()
 {
 	stringstream str;
-	
+
 	str << hex << setfill('0')
 		<<   "A: 0x"  << setw(2) << (int)ra_  << "  F: 0x"  << setw(2) << (int)rf_
 		<< "  A': 0x" << setw(2) << (int)ra2_ << "  F': 0x" << setw(2) << (int)rf2_ << endl
@@ -635,7 +642,9 @@ void Z80::dump_regs()
 		<< "IX: 0x"  << setw(4) << rix_ << endl
 		<< "IY: 0x"  << setw(4) << riy_ << endl
 		<< "SP: 0x"  << setw(4) << rsp_ << endl
-		<< "PC: 0x"  << setw(4) << rpc_ << endl;
+		<< "PC: 0x"  << setw(4) << rpc_ << endl
+		<<    "S: " << fs()  << "  Z: " << fz() << "  H: " << fh()
+		<< "  PV: " << fpv() << "  N: " << fn() << "  C: " << fc() << endl;
 
 	cout << str.str();
 }
