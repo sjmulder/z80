@@ -185,6 +185,7 @@ enum Op : uint8_t {
 	JP_PO = 0xE2,
 	AND_A_imm = 0xE6,
 	JP_PE = 0xEA,
+	JP_ind_HL = 0xEB,
 	EXT_ED = 0xED,
 	XOR_A_imm = 0xEE,
 	JP_P = 0xF2,
@@ -225,7 +226,8 @@ enum DDOp : uint8_t {
 	DD_OR_A_idx_IX = 0xB6,
 	DD_CP_idx_IX = 0xBE,
 	DD_LD_B_imm = 0xD5,
-	DD_LD_C_imm = 0xDE
+	DD_LD_C_imm = 0xDE,
+	DD_JP_ind_IX = 0xE9
 };
 
 enum EDOp : uint8_t {
@@ -259,7 +261,8 @@ enum FDOp : uint8_t {
 	FD_AND_A_idx_IY = 0xA6,
 	FD_XOR_A_idx_IY = 0xAE,
 	FD_OR_A_idx_IY = 0xB6,
-	FD_CP_idx_IY = 0xBE
+	FD_CP_idx_IY = 0xBE,
+	FD_JP_ind_IY = 0xE9
 };
 
 class Z80 {
@@ -565,6 +568,7 @@ string Z80::pc_str()
 		case JP_PE: str << "jp pe, 0x" << setw(4) << next16(); break;
 		case JP_M: str << "jp m, 0x" << setw(4) << next16(); break;
 		case JP_P: str << "jp p, 0x" << setw(4) << next16(); break;
+		case JP_ind_HL: str << "jp (hl)"; break;
 		case JR: str << "jr 0x" << setw(2) << (int)next(); break;
 		case JR_C: str << "jr c, 0x" << setw(2) << (int)next(); break;
 		case JR_NC: str << "jr nc, 0x" << setw(2) << (int)next(); break;
@@ -602,6 +606,7 @@ string Z80::pc_str()
 				case DD_XOR_A_idx_IX: str << "xor a, (ix + 0x" << setw(2) << (int)next() << ")"; break;
 				case DD_OR_A_idx_IX: str << "or a, (ix + 0x" << setw(2) << (int)next() << ")"; break;
 				case DD_CP_idx_IX: str << "cp (ix + 0x" << setw(2) << (int)next() << ")"; break;
+				case DD_JP_ind_IX: str << "jp (ix)"; break;
 				default: str << "0x" << (0xDD00 & code); break;
 			}
 			break;
@@ -640,6 +645,7 @@ string Z80::pc_str()
 				case FD_XOR_A_idx_IY: str << "xor a, (iy + 0x" << setw(2) << (int)next() << ")"; break;
 				case FD_OR_A_idx_IY: str << "or a, (iy + 0x" << setw(2) << (int)next() << ")"; break;
 				case FD_CP_idx_IY: str << "cp (iy + 0x" << setw(2) << (int)next() << ")"; break;
+				case FD_JP_ind_IY: str << "jp (iy)"; break;
 				default: str << "0x" << (0xFD00 & code); break;
 			}
 			break;
@@ -848,6 +854,7 @@ void Z80::step()
 		case JP_PE: tmp = next16(); if (fpv()) rpc_ = tmp; break;
 		case JP_M: tmp = next16(); if (fs()) rpc_ = tmp; break;
 		case JP_P: tmp = next16(); if (!fs()) rpc_ = tmp; break;
+		case JP_ind_HL: rpc_ = read(rhl()); break;
 		case JR: tmp = next(); rpc_ += *((int8_t*)&tmp); break;
 		case JR_C: tmp = next(); if (fc()) rpc_ += *((int8_t*)&tmp); break;
 		case JR_NC: tmp = next(); if (!fc()) rpc_ += *((int8_t*)&tmp); break;
@@ -885,6 +892,7 @@ void Z80::step()
 				case DD_XOR_A_idx_IX: ra_ = op_xor(ra_, read(rix_ + next())); break;
 				case DD_OR_A_idx_IX: ra_ = op_or(ra_, read(rix_ + next())); break;
 				case DD_CP_idx_IX: op_cp(read(rix_ + next())); break;
+				case DD_JP_ind_IX: rpc_ = read(rix_); break;
 
 				default:
 					cerr << "unknown 0xDD opcode: 0x" << code << endl;
@@ -929,6 +937,7 @@ void Z80::step()
 				case FD_XOR_A_idx_IY: ra_ = op_xor(ra_, read(riy_ + next())); break;
 				case FD_OR_A_idx_IY: ra_ = op_or(ra_, read(riy_ + next())); break;
 				case FD_CP_idx_IY: op_cp(read(riy_ + next())); break;
+				case FD_JP_ind_IY: rpc_ = read(riy_); break;
 					
 				default:
 					cerr << "unknown 0xFD opcode: 0x" << code << endl;
