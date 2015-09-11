@@ -25,6 +25,7 @@ enum Op : uint8_t {
 	LD_A_ind_BC = 0x0A,
 	INC_C = 0x0C,
 	DEC_C = 0x0D,
+	DJNZ = 0x10,
 	LD_ind_DE_A = 0x12,
 	INC_D = 0x14,
 	DEC_D = 0x15,
@@ -574,6 +575,7 @@ string Z80::pc_str()
 		case JR_NC: str << "jr nc, 0x" << setw(2) << (int)next(); break;
 		case JR_Z: str << "jr z, 0x" << setw(2) << (int)next(); break;
 		case JR_NZ: str << "jr nz, 0x" << setw(2) << (int)next(); break;
+		case DJNZ: str << "djnz 0x" << setw(2) << (int)next(); break;
 			
 		case EXT_DD:
 			switch (code = next()) {
@@ -860,6 +862,7 @@ void Z80::step()
 		case JR_NC: tmp = next(); if (!fc()) rpc_ += *((int8_t*)&tmp); break;
 		case JR_Z: tmp = next(); if (fz()) rpc_ += *((int8_t*)&tmp); break;
 		case JR_NZ: tmp = next(); if (!fz()) rpc_ += *((int8_t*)&tmp); break;
+		case DJNZ: tmp = next(); if (--rb_) rpc_ += *((int8_t*)&tmp); break;
 		
 		case EXT_DD:
 			switch (code = next()) {
@@ -986,11 +989,10 @@ int main()
 		                              //   |
 		// calculate 3 * 4            //   |
 		EXT_FD, FD_LD_A_imm, 0x00,    // <-+
-		EXT_DD, DD_LD_B_imm, 0x03,
-		EXT_DD, DD_LD_C_imm, 0x04,
-		ADD_A_B,                      // <-+
-		DEC_C,                        //   |
-		JP_NZ, 0x00, 0x17,            //  -+
+		EXT_DD, DD_LD_B_imm, 0x04,
+		EXT_DD, DD_LD_C_imm, 0x03,
+		ADD_A_C,                      // <-+
+		DJNZ, 0xFD,                   //  -+
 
 		XOR_A_imm, 0xFF,
 	
