@@ -167,15 +167,24 @@ enum Op : uint8_t {
 	CP_L,
 	CP_ind_HL,
 	CP_A = 0xBF,
+	JP_NZ = 0xC2,
+	JP = 0xC3,
 	ADD_A_imm = 0xC6,
+	JP_Z = 0xCA,
 	ADC_A_imm = 0xCE,
+	JP_NC = 0xD2,
 	SUB_A_imm = 0xD6,
+	JP_C = 0xD8,
 	EXT_DD = 0xDD,
 	SBC_A_imm = 0xDE,
+	JP_PO = 0xE2,
 	AND_A_imm = 0xE6,
+	JP_PE = 0xEA,
 	EXT_ED = 0xED,
 	XOR_A_imm = 0xEE,
+	JP_P = 0xF2,
 	OR_A_imm = 0xF6,
+	JP_M = 0xFA,
 	EXT_FD = 0xFD,
 	CP_imm = 0xFE
 };
@@ -542,6 +551,15 @@ string Z80::pc_str()
 		case DEC_F: str << "dec f"; break;
 		case DEC_L: str << "dec l"; break;
 		case DEC_ind_HL: str << "dec (hl)"; break;
+		case JP: str << "jp 0x" << setw(4) << next16(); break;
+		case JP_C: str << "jp c, 0x" << setw(4) << next16(); break;
+		case JP_NC: str << "jp nc, 0x" << setw(4) << next16(); break;
+		case JP_Z: str << "jp z, 0x" << setw(4) << next16(); break;
+		case JP_NZ: str << "jp nz, 0x" << setw(4) << next16(); break;
+		case JP_PO: str << "jp po, 0x" << setw(4) << next16(); break;
+		case JP_PE: str << "jp pe, 0x" << setw(4) << next16(); break;
+		case JP_M: str << "jp m, 0x" << setw(4) << next16(); break;
+		case JP_P: str << "jp p, 0x" << setw(4) << next16(); break;
 			
 		case EXT_DD:
 			switch (code = next()) {
@@ -811,6 +829,15 @@ void Z80::step()
 		case DEC_F: rf_ = op_dec(rf_); break;
 		case DEC_L: rl_ = op_dec(rl_); break;
 		case DEC_ind_HL: tmp = read(rhl()) + next(); write(tmp, op_dec(read(tmp))); break;
+		case JP: rpc_ = next16(); break;
+		case JP_C: tmp = next16(); if (fc()) rpc_ = tmp; break;
+		case JP_NC: tmp = next16(); if (!fc()) rpc_ = tmp; break;
+		case JP_Z: tmp = next16(); if (fz()) rpc_ = tmp; break;
+		case JP_NZ: tmp = next16(); if (!fz()) rpc_ = tmp; break;
+		case JP_PO: tmp = next16(); if (!fpv()) rpc_ = tmp; break;
+		case JP_PE: tmp = next16(); if (fpv()) rpc_ = tmp; break;
+		case JP_M: tmp = next16(); if (fs()) rpc_ = tmp; break;
+		case JP_P: tmp = next16(); if (!fs()) rpc_ = tmp; break;
 		
 		case EXT_DD:
 			switch (code = next()) {
@@ -929,13 +956,20 @@ int main()
 {
 	Z80 cpu;
 	cpu.ram() = {
-		EXT_FD, FD_LD_A_ext, 0x00, 0x03,
-		LD_B_A,
-		ADD_A_B,
-		SUB_A_B,
-		SUB_A_B,
-		OR_A_imm, 0xF0,
+		JP, 0x00, 0x0F,               //  -+
+		'H', 'e', 'l', 'l', 'o', ' ', //   |
+		'W', 'o', 'r', 'l', 'd', '!', //   |
+		                              //   |
+		// calculate 3 * 4            //   |
+		EXT_FD, FD_LD_A_imm, 0x00,    // <-+
+		EXT_DD, DD_LD_B_imm, 0x03,
+		EXT_DD, DD_LD_C_imm, 0x04,
+		ADD_A_B,                      // <-+
+		DEC_C,                        //   |
+		JP_NZ, 0x00, 0x18,            //  -+
+
 		XOR_A_imm, 0xFF,
+	
 		NOOP
 	};
 
