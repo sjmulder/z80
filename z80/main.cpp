@@ -439,7 +439,7 @@ string Z80::pc_str()
 		case ADD_A_F: str << "add a, f"; break;
 		case ADD_A_L: str << "add a, l"; break;
 		case ADD_A_ind_HL: str << "add a, (hl)"; break;
-		case ADD_A_imm: str << "add a, 0x" << setw(2) << next(); break;
+		case ADD_A_imm: str << "add a, 0x" << setw(2) << (int)next(); break;
 		case ADC_A_A: str << "adc a, a"; break;
 		case ADC_A_B: str << "adc a, b"; break;
 		case ADC_A_C: str << "adc a, c"; break;
@@ -448,7 +448,7 @@ string Z80::pc_str()
 		case ADC_A_F: str << "adc a, f"; break;
 		case ADC_A_L: str << "adc a, l"; break;
 		case ADC_A_ind_HL: str << "adc a, (hl)"; break;
-		case ADC_A_imm: str << "adc a, 0x" << setw(2) << next(); break;
+		case ADC_A_imm: str << "adc a, 0x" << setw(2) << (int)next(); break;
 		case SUB_A_A: str << "sub a, a"; break;
 		case SUB_A_B: str << "sub a, b"; break;
 		case SUB_A_C: str << "sub a, c"; break;
@@ -457,7 +457,7 @@ string Z80::pc_str()
 		case SUB_A_F: str << "sub a, f"; break;
 		case SUB_A_L: str << "sub a, l"; break;
 		case SUB_A_ind_HL: str << "sub a, (hl)"; break;
-		case SUB_A_imm: str << "sub a, 0x" << setw(2) << next(); break;
+		case SUB_A_imm: str << "sub a, 0x" << setw(2) << (int)next(); break;
 		case SBC_A_A: str << "sbc a, a"; break;
 		case SBC_A_B: str << "sbc a, b"; break;
 		case SBC_A_C: str << "sbc a, c"; break;
@@ -466,7 +466,7 @@ string Z80::pc_str()
 		case SBC_A_F: str << "sbc a, f"; break;
 		case SBC_A_L: str << "sbc a, l"; break;
 		case SBC_A_ind_HL: str << "sbc a, (hl)"; break;
-		case SBC_A_imm: str << "sbc a, 0x" << setw(2) << next(); break;
+		case SBC_A_imm: str << "sbc a, 0x" << setw(2) << (int)next(); break;
 		case AND_A_A: str << "and a, a"; break;
 		case AND_A_B: str << "and a, b"; break;
 		case AND_A_C: str << "and a, c"; break;
@@ -475,7 +475,7 @@ string Z80::pc_str()
 		case AND_A_F: str << "and a, f"; break;
 		case AND_A_L: str << "and a, l"; break;
 		case AND_A_ind_HL: str << "and a, (hl)"; break;
-		case AND_A_imm: str << "and a, 0x" << setw(2) << next(); break;
+		case AND_A_imm: str << "and a, 0x" << setw(2) << (int)next(); break;
 		case XOR_A_A: str << "xor a, a"; break;
 		case XOR_A_B: str << "xor a, b"; break;
 		case XOR_A_C: str << "xor a, c"; break;
@@ -484,7 +484,7 @@ string Z80::pc_str()
 		case XOR_A_F: str << "xor a, f"; break;
 		case XOR_A_L: str << "xor a, l"; break;
 		case XOR_A_ind_HL: str << "xor a, (hl)"; break;
-		case XOR_A_imm: str << "xor a, 0x" << setw(2) << next(); break;
+		case XOR_A_imm: str << "xor a, 0x" << setw(2) << (int)next(); break;
 		case OR_A_A: str << "or a, a"; break;
 		case OR_A_B: str << "or a, b"; break;
 		case OR_A_C: str << "or a, c"; break;
@@ -493,7 +493,7 @@ string Z80::pc_str()
 		case OR_A_F: str << "or a, f"; break;
 		case OR_A_L: str << "or a, l"; break;
 		case OR_A_ind_HL: str << "or a, (hl)"; break;
-		case OR_A_imm: str << "or a, 0x" << setw(2) << next(); break;
+		case OR_A_imm: str << "or a, 0x" << setw(2) << (int)next(); break;
 		case CP_A: str << "cp a"; break;
 		case CP_B: str << "cp b"; break;
 		case CP_C: str << "cp c"; break;
@@ -502,7 +502,7 @@ string Z80::pc_str()
 		case CP_F: str << "cp f"; break;
 		case CP_L: str << "cp l"; break;
 		case CP_ind_HL: str << "cp (hl)"; break;
-		case CP_imm: str << "cp 0x" << setw(2) << next(); break;
+		case CP_imm: str << "cp 0x" << setw(2) << (int)next(); break;
 		case INC_A: str << "inc a"; break;
 		case INC_B: str << "inc b"; break;
 		case INC_C: str << "inc c"; break;
