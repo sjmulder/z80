@@ -28,16 +28,21 @@ enum Op : uint8_t {
 	LD_ind_DE_A = 0x12,
 	INC_D = 0x14,
 	DEC_D = 0x15,
+	JR = 0x18,
 	LD_A_ind_DE = 0x1A,
 	INC_E = 0x1C,
 	DEC_E = 0x1D,
+	JR_NZ = 0x20,
 	INC_F = 0x24,
 	DEC_F = 0x25,
+	JR_Z = 0x28,
 	INC_L = 0x2C,
 	DEC_L = 0x2D,
+	JR_NC = 0x30,
 	LD_ext_A = 0x32,
 	INC_ind_HL = 0x34,
 	DEC_ind_HL = 0x35,
+	JR_C = 0x38,
 	INC_A = 0x3C,
 	DEC_A = 0x3D,
 	LD_B_B = 0x40,
@@ -560,6 +565,11 @@ string Z80::pc_str()
 		case JP_PE: str << "jp pe, 0x" << setw(4) << next16(); break;
 		case JP_M: str << "jp m, 0x" << setw(4) << next16(); break;
 		case JP_P: str << "jp p, 0x" << setw(4) << next16(); break;
+		case JR: str << "jr 0x" << setw(2) << (int)next(); break;
+		case JR_C: str << "jr c, 0x" << setw(2) << (int)next(); break;
+		case JR_NC: str << "jr nc, 0x" << setw(2) << (int)next(); break;
+		case JR_Z: str << "jr z, 0x" << setw(2) << (int)next(); break;
+		case JR_NZ: str << "jr nz, 0x" << setw(2) << (int)next(); break;
 			
 		case EXT_DD:
 			switch (code = next()) {
@@ -838,6 +848,11 @@ void Z80::step()
 		case JP_PE: tmp = next16(); if (fpv()) rpc_ = tmp; break;
 		case JP_M: tmp = next16(); if (fs()) rpc_ = tmp; break;
 		case JP_P: tmp = next16(); if (!fs()) rpc_ = tmp; break;
+		case JR: tmp = next(); rpc_ += *((int8_t*)&tmp); break;
+		case JR_C: tmp = next(); if (fc()) rpc_ += *((int8_t*)&tmp); break;
+		case JR_NC: tmp = next(); if (!fc()) rpc_ += *((int8_t*)&tmp); break;
+		case JR_Z: tmp = next(); if (fz()) rpc_ += *((int8_t*)&tmp); break;
+		case JR_NZ: tmp = next(); if (!fz()) rpc_ += *((int8_t*)&tmp); break;
 		
 		case EXT_DD:
 			switch (code = next()) {
@@ -956,7 +971,7 @@ int main()
 {
 	Z80 cpu;
 	cpu.ram() = {
-		JP, 0x00, 0x0F,               //  -+
+		JR, 0x0C,                     //  -+
 		'H', 'e', 'l', 'l', 'o', ' ', //   |
 		'W', 'o', 'r', 'l', 'd', '!', //   |
 		                              //   |
@@ -966,7 +981,7 @@ int main()
 		EXT_DD, DD_LD_C_imm, 0x04,
 		ADD_A_B,                      // <-+
 		DEC_C,                        //   |
-		JP_NZ, 0x00, 0x18,            //  -+
+		JP_NZ, 0x00, 0x17,            //  -+
 
 		XOR_A_imm, 0xFF,
 	
