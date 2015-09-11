@@ -653,7 +653,7 @@ string Z80::pc_str()
 			break;
 			
 		default:
-			str << "0x" << code;;
+			str << "0x" << (int)code;;
 			break;
 	}
 	
@@ -898,7 +898,7 @@ void Z80::step()
 				case DD_JP_ind_IX: rpc_ = read(rix_); break;
 
 				default:
-					cerr << "unknown 0xDD opcode: 0x" << code << endl;
+					cerr << "unknown 0xDD opcode: 0x" << (int)code << endl;
 					break;
 			}
 			break;
@@ -909,7 +909,7 @@ void Z80::step()
 				case ED_LD_imp_R_A: rr_ = ra_; break;
 					
 				default:
-					cerr << "unknown 0xED opcode: 0x" << code << endl;
+					cerr << "unknown 0xED opcode: 0x" << (int)code << endl;
 					break;
 			}
 			break;
@@ -943,13 +943,13 @@ void Z80::step()
 				case FD_JP_ind_IY: rpc_ = read(riy_); break;
 					
 				default:
-					cerr << "unknown 0xFD opcode: 0x" << code << endl;
+					cerr << "unknown 0xFD opcode: 0x" << (int)code << endl;
 					break;
 			}
 			break;
 			
 		default:
-			cerr << "unknown opcode: 0x" << code << endl;
+			cerr << "unknown opcode: 0x" << (int)code << endl;
 			break;
 	}
 }
