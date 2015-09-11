@@ -320,7 +320,7 @@ class Z80 {
 	uint8_t op_and(uint8_t a, uint8_t b) { return w_logic_flags(a & b); }
 	uint8_t op_xor(uint8_t a, uint8_t b) { return w_logic_flags(a ^ b); }
 	uint8_t op_or(uint8_t a, uint8_t b) { return w_logic_flags(a | b); }
-	void op_cp(uint8_t a) { w_logic_flags(a); }
+	void op_cp(uint8_t a) { w_calc_flags(ra_ - a, true); }
 	uint8_t op_inc(uint8_t a) { return w_calc_flags(a + 1, false); }
 	uint8_t op_dec(uint8_t a) { return w_calc_flags(a - 1, false); }
 	
